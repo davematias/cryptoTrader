@@ -16,7 +16,7 @@ module.exports.init = function init() {
         next();
     });
 
-    app.get('/', (req, res) => {
+    app.get('/api', (req, res) => {
         res.send('api started');
     });
 
@@ -24,13 +24,13 @@ module.exports.init = function init() {
     //app.use('/api', api);
 
     // Serve static files from the React app
-    //app.use(express.static(path.join(__dirname, 'client/build')));
+    app.use(express.static(path.join(__dirname, '../frontend/web-ui/build')));
 
     // The "catchall" handler: for any request that doesn't
     // match one above, send back React's index.html file.
-    /* app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname+'/client/build/index.html'));
-    }); */
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname+'../frontend/web-ui/build/index.html'));
+    });
 
     const port = process.env.PORT || 5000;
     app.listen(port);
