@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const bodyParser = require('body-parser');
+const api = require('./apiRouter');
 
 module.exports.init = function init() {
     // Parsers for POST data
@@ -15,13 +16,9 @@ module.exports.init = function init() {
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
     });
-
-    app.get('/api', (req, res) => {
-        res.send('api started');
-    });
-
+    
     // Set our api router
-    //app.use('/api', api);
+    app.use('/api', api);
 
     // Serve static files from the React app
     app.use(express.static(path.join(__dirname, '../frontend/web-ui/build')));

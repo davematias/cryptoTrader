@@ -1,15 +1,15 @@
 const GDAX = require('gdax');
-const gdaxKey = "INSERT_YOUR_GDAX_KEY";
-const gdaxSecret = "INSERT_YOUR_GDAX_SECRET";
-const passPhrase = "INSERT_YOUR_GDAX_PASSPHRASE";
+const gdaxKey = process.env.gdaxKey;
+const gdaxSecret = process.env.gdaxSecret;
+const passPhrase = process.env.passPhrase;
 const apiURI = 'https://api.gdax.com';
-const BTC_USD = ['BTC-USD'];
+const CURRENCIES = ['BTC-USD', 'ETH-BTC', 'ETH-USD'];
 
 module.exports = class GDAXTrader {
   constructor() {
     this.publicClient = new GDAX.PublicClient();
     //this.authenticatedClient = new GDAX.AuthenticatedClient(gdaxKey, gdaxSecret, passPhrase, apiURI);
-    this.websocket = new GDAX.WebsocketClient(BTC_USD);
+    this.websocket = new GDAX.WebsocketClient(CURRENCIES);
 
     this.SocketListener = (data) => {
       if (!(data.type === 'done' && data.reason === 'filled')) {
@@ -38,21 +38,23 @@ module.exports = class GDAXTrader {
     return this.authenticatedClient.getAccounts();
   }
 
-  Buy(buyData) {
+  buy(buyData) {
     const buyParams = {
         'price': buyData.price,
         'size': buyData.size,
-        'product_id': BTC_USD,
+        'product_id': buyData.product_id,
     };
-    this.buyOrderId = authedClient.buy(buyParams, callback);
+
+    return authedClient.buy(buyParams, callback);
   }
 
-  placeSell(buyData) {
+  sell(buyData) {
     const sellParams = {
         'price': buyData.price,
         'size': buyData.size,
-        'product_id': BTC_USD
+        'product_id': buyData.product_id
     };
-    this.sellOrderId = authedClient.sell(sellParams,  callback);
+    
+    return authedClient.sell(sellParams,  callback);
   }
 }
