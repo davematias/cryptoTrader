@@ -1,32 +1,41 @@
 import React, { Component } from 'react';
-import { Input, Label, Menu } from 'semantic-ui-react'
+import { Input, Button, Menu } from 'semantic-ui-react'
+import axios from 'axios';
 
 class ManualTradingMenu extends Component {
-    state = { activeItem: 'inbox' }
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeItem: '',
+      products: [] 
+    };
+  }
 
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+  componentDidMount() {
+    axios.get(`http://localhost:5000/api/products`)
+      .then(result => {        
+        this.setState({ products: result.data});
+      })
+  }
+  
+  handleClick = (e, { name }) => this.setState({ activeItem: name })
 
-  render() {
-    const { activeItem } = this.state
-
+  render() {    
     return (
       <Menu vertical>
-        <Menu.Item name='inbox' active={activeItem === 'inbox'} onClick={this.handleItemClick}>
-          <Label color='teal'>1</Label>
-          Inbox
-        </Menu.Item>
-
-        <Menu.Item name='spam' active={activeItem === 'spam'} onClick={this.handleItemClick}>
-          <Label>51</Label>
-          Spam
-        </Menu.Item>
-
-        <Menu.Item name='updates' active={activeItem === 'updates'} onClick={this.handleItemClick}>
-          <Label>1</Label>
-          Updates
+        {
+          this.state.products.map((x, idx) => {
+            return <Menu.Item key={idx}>                      
+                <Button name={x.id} toggle secondary active={this.state.activeItem === x.id} onClick={this.handleClick} >{x.id}</Button>
+            </Menu.Item>            
+          })
+        }        
+        <Menu.Item>
+          <Input placeholder='Insert amount...' />
         </Menu.Item>
         <Menu.Item>
-          <Input icon='search' placeholder='Search mail...' />
+          <Button primary>Buy</Button>
+          <Button primary>Sell</Button>
         </Menu.Item>
       </Menu>
     )

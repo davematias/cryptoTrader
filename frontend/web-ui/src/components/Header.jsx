@@ -5,16 +5,27 @@ import {
   } from 'semantic-ui-react'
 
 class HeaderBar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      
+    };
+  }
+  
   render() {
     return (
         <Menu fixed='top' inverted>
         <Container>
-          <Menu.Item as='a' header>            
+          <Menu.Item header>            
             User Name
           </Menu.Item>
-          <Menu.Item as='a'>BTC: -</Menu.Item>
-          <Menu.Item as='a'>ETH: -</Menu.Item>
-          <Menu.Item as='a'>EUR: -</Menu.Item>  
+          {
+            this.props.currencies.map((x, idx) => {
+              return <Menu.Item key={idx}>
+                {x.id}: -
+              </Menu.Item>    
+            })
+          }          
         </Container>
       </Menu>  
     );
