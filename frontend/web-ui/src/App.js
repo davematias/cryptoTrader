@@ -3,11 +3,11 @@ import HeaderBar from './components/Header';
 import ManualTradingMenu from './components/ManualTradingMenu';
 import './App.css';
 import {
-  Container,  
+  Container,
   Grid,
-  Header  
+  Header
 } from 'semantic-ui-react'
-import axios from 'axios';
+import TraderClient from './client/TraderClient';
 
 class App extends Component {
   constructor(props) {
@@ -15,30 +15,35 @@ class App extends Component {
     this.state = {
       currencies: []
     };
+    this.client = new TraderClient();
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:5000/api/currencies`)
-      .then(result => {        
+    this.client.getCurrencies()
+      .then(result => {
         this.setState({ currencies: result.data});
-      })
+      });
+
+      this.client.subscribeToDataUpdates((data) => {
+        console.log(data);
+      });
   }
 
   render() {
     return (
       <div className="App">
-        <HeaderBar currencies={this.state.currencies} />              
-            <Grid container divided stackable style={{ marginTop: '2em' }}>              
+        <HeaderBar currencies={this.state.currencies} />
+            <Grid container divided stackable style={{ marginTop: '2em' }}>
                 <Grid.Column width={4}>
                   <ManualTradingMenu currencies={this.state.currencies} />
                 </Grid.Column>
                 <Grid.Column width={8}>
                   <Header as='h1'>Semantic UI React Fixed Template</Header>
-                  <Container text style={{ marginTop: '7em' }}>      
-                    <p>This is a basic fixed menu template using fixed size containers.</p>      
-                  </Container>    
-                </Grid.Column>                        
-            </Grid>            
+                  <Container text style={{ marginTop: '7em' }}>
+                    <p>This is a basic fixed menu template using fixed size containers.</p>
+                  </Container>
+                </Grid.Column>
+            </Grid>
       </div>
     );
   }

@@ -16,6 +16,11 @@ module.exports = class GDAXTrader {
         return;
       }
 
+      //if there is a global websocket
+      if(global.io) {
+        global.io.emit('data', data);
+      }
+
       console.dir(data);
     };
 
@@ -54,7 +59,7 @@ module.exports = class GDAXTrader {
         'size': buyData.size,
         'product_id': buyData.product_id
     };
-    
+
     return authedClient.sell(sellParams,  callback);
   }
 }

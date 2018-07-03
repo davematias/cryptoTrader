@@ -3,6 +3,8 @@ const path = require('path');
 const app = express();
 const bodyParser = require('body-parser');
 const api = require('./apiRouter');
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 module.exports.init = function init() {
     // Parsers for POST data
@@ -11,12 +13,13 @@ module.exports.init = function init() {
 
     // Cross Origin middleware
     app.use(function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+        res.header("Access-Control-Allow-Credentials", "true");
         res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
     });
-    
+
     // Set our api router
     app.use('/api', api);
 
@@ -30,7 +33,14 @@ module.exports.init = function init() {
     });
 
     const port = process.env.PORT || 5000;
-    app.listen(port);
+
+    io.on('connection', function(socket){
+      console.log('User connected');
+    });
+
+    http.listen(port);
 
     console.log(`Server listening on ${port}`);
+
+    return io;
 }

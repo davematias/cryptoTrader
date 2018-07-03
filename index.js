@@ -6,5 +6,7 @@ const api = require('./express/api')
 global.trader = new gdaxTrader();
 
 //initialize express server
-api.init();
+global.io = api.init();
+
+
 
