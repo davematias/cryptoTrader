@@ -30,7 +30,7 @@ class TestTrader {
     async start() {
         try {
           const history = await this.historical.getData();
-
+          
           await Promise.all(history.map((stick, index) => {
             const sticks = history.slice(0, index + 1)
             return this.strategy.run({
@@ -67,7 +67,7 @@ class TestTrader {
     async onBuySignal({ price, time }) {
       const id = randomstring.generate(20)
       this.strategy.positionOpened({
-        price, time, size: 1.0, id
+        price, time, size: process.env.BuyAmount, id
       })
     }
   

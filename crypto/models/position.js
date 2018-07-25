@@ -27,14 +27,16 @@ class Position {
     console.log(`${enter} - ${exit} - ${profit}`)
   }
 
-  profit() {
-    const fee = 0.0025
-    const entrance = (this.enter.price) * (1 + fee)
+  profit() {            
+    const buyAmount = parseFloat(process.env.BuyAmount);
+    const buyfee = buyAmount * parseFloat(process.env.Fee);
+    const entranceBtcAmount = (buyAmount-buyfee) / this.enter.price;
+        
     if (this.exit) {
-      const exit = (this.exit.price) * (1 - fee)
-      return exit - entrance
+      const sellFee = entranceBtcAmount * parseFloat(process.env.Fee);    
+      return ((this.exit.price) * (entranceBtcAmount - sellFee)) - buyAmount;
     } else {
-      return 0
+      return 0;
     }
   }
 
