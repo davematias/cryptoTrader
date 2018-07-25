@@ -13,3 +13,12 @@ sudo apt-get install nodejs
 How to run
 run build script
 forever start index.js
+
+.env params
+Mode
+FromDays
+Interval
+Product
+Strategy
+Fee
+BuyAmount
