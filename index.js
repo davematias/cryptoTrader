@@ -11,10 +11,11 @@ if(process.env.Mode === 'test'){
     trader = new gdaxTrader();
 }
 
-trader.start();
+//trader.start();
 global.trader = trader;
+
 //initialize express server
-//global.io = api.init();
+global.io = api.init();
 
 
 

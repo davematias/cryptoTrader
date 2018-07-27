@@ -5,6 +5,11 @@ router.get('/', (req, res) => {
     res.send('api started');
 });
 
+router.post('/start', (req, res) => {
+  global.trader.start();
+  res.send('trader started');
+});
+
 /* GET available currencies */
 router.get('/currencies', (req, res) => {
     global.trader.getCurrenciesPromise()
@@ -33,17 +38,17 @@ router.post('/buy', (req, res) => {
         res.status(200).json({ id });
     } catch (error) {
         res.status(500).send(e);
-    }    
+    }
 });
 
 /* POST sell order */
-router.post('/buy', (req, res) => {
+router.post('/sell', (req, res) => {
     try {
         let id = global.trader.sell(req.body);
         res.status(200).json({ id });
     } catch (error) {
         res.status(500).send(e);
-    }    
+    }
 });
-  
+
 module.exports = router;

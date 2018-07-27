@@ -35,9 +35,6 @@ module.exports = class GDAXTrader {
     return this.publicClient.getProducts();
   }
 
-  getProductHistoricalRatesPromise(currencyA, currencyB, granularity) {
-    return this.publicClient.getProductHistoricRates(`${currencyA}-${currencyB}`, { granularity });
-  }
 
   getAccountsPromise() {
     return this.authenticatedClient.getAccounts();

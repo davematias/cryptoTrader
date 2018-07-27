@@ -27,13 +27,13 @@ class Position {
     console.log(`${enter} - ${exit} - ${profit}`)
   }
 
-  profit() {            
+  profit() {
     const buyAmount = parseFloat(process.env.BuyAmount);
     const buyfee = buyAmount * parseFloat(process.env.Fee);
     const entranceBtcAmount = (buyAmount-buyfee) / this.enter.price;
-        
+
     if (this.exit) {
-      const sellFee = entranceBtcAmount * parseFloat(process.env.Fee);    
+      const sellFee = entranceBtcAmount * parseFloat(process.env.Fee);
       return ((this.exit.price) * (entranceBtcAmount - sellFee)) - buyAmount;
     } else {
       return 0;
@@ -42,6 +42,14 @@ class Position {
 
   profitString() {
     return this.profit().toFixed(2)
+  }
+
+  getData() {
+   return {
+    enterData: this.enter,
+    exitData: this.exit,
+    profit: this.profit()
+   };
   }
 }
 
