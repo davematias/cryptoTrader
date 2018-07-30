@@ -27,19 +27,6 @@ module.exports = class GDAXTrader {
     this.websocket.addListener("message", this.SocketListener);
   }
 
-  getCurrenciesPromise() {
-    return this.publicClient.getCurrencies();
-  }
-
-  getProductsPromise() {
-    return this.publicClient.getProducts();
-  }
-
-
-  getAccountsPromise() {
-    return this.authenticatedClient.getAccounts();
-  }
-
   buy(buyData) {
     const buyParams = {
         'price': buyData.price,

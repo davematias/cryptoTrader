@@ -46,9 +46,8 @@ class Position {
 
   getData() {
    return {
-    enterData: this.enter,
-    exitData: this.exit,
-    profit: this.profit()
+    enter: this.enter,
+    exit: this.exit,
    };
   }
 }

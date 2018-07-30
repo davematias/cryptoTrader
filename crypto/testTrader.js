@@ -5,14 +5,17 @@ const colors = require('colors/safe');
 const Trader = require('./trader')
 
 class TestTrader extends Trader {
-    constructor(){
-        super();
+    constructor(traderConfig){
+        super(traderConfig);
 
         let date = new Date();
-        date.setDate(date.getDate()-process.env.FromDays);
+        date.setDate(date.getDate()-traderConfig.FromDays);
         this.startTime = date;
         this.endTime = new Date();
-        this.interval = process.env.Interval;
+        this.interval = traderConfig.Interval;
+        this.buyAmount = traderConfig.BuyAmount;
+        this.fee = traderConfig.Fee;
+        this.stopTask = false;
 
         this.historical = new HistoricalService({
           start: this.startTime,
@@ -23,8 +26,14 @@ class TestTrader extends Trader {
     }
 
     async start() {
+        this.stopTask = false;
+
         try {
           const history = await this.historical.getData();
+
+          if(this.stopTask) {
+            return;
+          }
 
           await Promise.all(history.map((stick, index) => {
             const sticks = history.slice(0, index + 1)
@@ -33,8 +42,8 @@ class TestTrader extends Trader {
             })
           }));
 
-          this.printPositions();
-          this.printProfit();
+          //this.printPositions();
+          //this.printProfit();
           this.sendAllPositions();
 
         } catch (error) {
@@ -42,14 +51,33 @@ class TestTrader extends Trader {
         }
     }
 
+    stop() {
+      this.stopTask = true;
+    }
+
     sendAllPositions() {
       const positions = this.strategy.getPositions();
       positions.forEach((p) => {
+       let data = p.getData();
+       data.profit = this.calcProfit(data);
        this.sendPositionData(p.getData());
       });
     }
 
-    printPositions() {
+    calcProfit(positionData) {
+      const buyAmount = parseFloat(this.buyAmount);
+      const buyfee = buyAmount * parseFloat(this.fee);
+      const entranceAmount = (buyAmount-buyfee) / positionData.enter.price;
+  
+      if (this.exit) {
+        const sellFee = entranceAmount * parseFloat(this.fee);
+        return ((positionData.exit.price) * (entranceAmount - sellFee)) - buyAmount;
+      } else {
+        return 0;
+      }
+    }
+
+    /* printPositions() {
       const positions = this.strategy.getPositions();
       positions.forEach((p) => {
         p.print();
@@ -65,7 +93,7 @@ class TestTrader extends Trader {
       const prof = `${total}`;
       const colored = total > 0 ? colors.green(prof) : colors.red(prof)
       console.log(`Total: ${colored}`);
-    }
+    } */
 
     async onBuySignal({ price, time }) {
       const id = randomstring.generate(20)

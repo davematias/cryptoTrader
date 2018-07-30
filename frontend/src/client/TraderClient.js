@@ -16,6 +16,10 @@ class TradeClient {
     this.socket.on('position.update', content => cb(content));
   }
 
+  getDefaultTraderConfig() {
+    return axios.get(`${url}/api/getDefaultConfig`);
+  }
+
   getProducts() {
     return axios.get(`${url}/api/products`);
   }
@@ -24,8 +28,12 @@ class TradeClient {
     return axios.get(`${url}/api/currencies`);
   }
 
-  startTrader() {
-    return axios.post(`${url}/api/start`);
+  startTrader(config) {
+    return axios.post(`${url}/api/start`, config);
+  }
+
+  stopTrader() {
+    return axios.post(`${url}/api/stop`);
   }
 }
 

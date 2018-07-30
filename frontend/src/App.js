@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import HeaderBar from './components/Header';
+import TradingMenu from './components/TradingMenu';
 import './App.css';
 import {
   Container,
   Grid,
-  Header,
-  Button
+  Header
 } from 'semantic-ui-react'
 import TraderClient from './client/TraderClient';
 
@@ -13,30 +13,25 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currencies: [],
-      client: new TraderClient()
+      currencies: []      
     };
+
+    this.client = new TraderClient()
   }
 
   componentDidMount() {
-    this.state.client.getCurrencies()
+    this.client.getCurrencies()
       .then(result => {
         this.setState({ currencies: result.data});
       });
 
-      this.state.client.subscribeToDataUpdates((data) => {
+      this.client.subscribeToDataUpdates((data) => {
         console.log(data);
       });
 
-      this.state.client.subscribeToPositionUpdates((data) => {
+      this.client.subscribeToPositionUpdates((data) => {
         console.log(data);
       });
-  }
-
-  startTrader = () => {
-    this.state.client.startTrader().then(result => {
-      console.log("happy trading!");
-    });
   }
 
   render() {
@@ -44,10 +39,12 @@ class App extends Component {
       <div className="App">
         <HeaderBar currencies={this.state.currencies} />
             <Grid container divided stackable style={{ marginTop: '2em' }}>
-                <Grid.Column width={12}>
+                <Grid.Column width={4}>
+                  <TradingMenu />
+                </Grid.Column>
+                <Grid.Column width={8}>
                   <Header as='h1'>Semantic UI React Fixed Template</Header>
-                  <Container text style={{ marginTop: '7em' }}>
-                    <div>Start Trader   <Button onClick={this.startTrader} primary>Start</Button></div>
+                  <Container text style={{ marginTop: '7em' }}>                
                     <p>This is a basic fixed menu template using fixed size containers.</p>
                   </Container>
                 </Grid.Column>

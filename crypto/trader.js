@@ -2,27 +2,23 @@ const strategyFactory = require('./strategies/strategyFactory');
 const GDAX = require('gdax');
 
 class Trader {
-  constructor() {
+  constructor(traderConfig) {
     this.publicClient = new GDAX.PublicClient();
-    this.product = process.env.Product;
+    this.product = traderConfig.Product;
 
-    this.strategy = strategyFactory.create(process.env.Strategy, {
+    this.strategy = strategyFactory.create(traderConfig.Strategy, {
       onBuySignal: (x) => { this.onBuySignal(x); },
       onSellSignal: (x) => { this.onSellSignal(x); }
     });
   }
 
-  async start() {
+  async start() {  }
 
-  }
+  stop() {  }
 
-  async onBuySignal({ price, time }) {
+  async onBuySignal({ price, time }) {  }
 
-  }
-
-  async onSellSignal({ price, size, time, position }) {
-
-  }
+  async onSellSignal({ price, size, time, position }) {  }
 
   getCurrenciesPromise() {
     return this.publicClient.getCurrencies();
@@ -31,7 +27,6 @@ class Trader {
   getProductsPromise() {
     return this.publicClient.getProducts();
   }
-
 
   getAccountsPromise() {
     return this.authenticatedClient.getAccounts();
