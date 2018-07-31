@@ -12,6 +12,10 @@ class TradeClient {
     this.socket.on('data', content => cb(content));
   }
 
+  subscribeToTraderStatusUpdates(cb) {
+    this.socket.on('trader.status', status => cb(status));
+  }
+
   subscribeToPositionUpdates(cb) {
     this.socket.on('position.update', content => cb(content));
   }

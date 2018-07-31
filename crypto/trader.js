@@ -12,13 +12,21 @@ class Trader {
     });
   }
 
-  async start() {  }
+  async start() {
+    if (global.io) {
+      global.io.emit('trader.status', 'started');
+    }
+  }
 
-  stop() {  }
+  stop() {
+    if (global.io) {
+      global.io.emit('trader.status', 'stopped');
+    }
+  }
 
-  async onBuySignal({ price, time }) {  }
+  async onBuySignal({ price, time }) { }
 
-  async onSellSignal({ price, size, time, position }) {  }
+  async onSellSignal({ price, size, time, position }) { }
 
   getCurrenciesPromise() {
     return this.publicClient.getCurrencies();
@@ -33,7 +41,7 @@ class Trader {
   }
 
   sendPositionData(positionData) {
-    if(global.io) {
+    if (global.io) {
       global.io.emit('position.update', positionData);
     }
   }

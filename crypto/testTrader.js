@@ -1,8 +1,6 @@
 const HistoricalService = require('./historicalService');
-const strategyFactory = require('./strategies/strategyFactory');
 const randomstring = require('randomstring');
-const colors = require('colors/safe');
-const Trader = require('./trader')
+const Trader = require('./trader');
 
 class TestTrader extends Trader {
     constructor(traderConfig){
@@ -26,6 +24,7 @@ class TestTrader extends Trader {
     }
 
     async start() {
+        super.start();
         this.stopTask = false;
 
         try {
@@ -45,6 +44,7 @@ class TestTrader extends Trader {
           //this.printPositions();
           //this.printProfit();
           this.sendAllPositions();
+          super.stop();
 
         } catch (error) {
           console.log(error);
@@ -53,6 +53,7 @@ class TestTrader extends Trader {
 
     stop() {
       this.stopTask = true;
+      super.stop();
     }
 
     sendAllPositions() {
@@ -68,7 +69,7 @@ class TestTrader extends Trader {
       const buyAmount = parseFloat(this.buyAmount);
       const buyfee = buyAmount * parseFloat(this.fee);
       const entranceAmount = (buyAmount-buyfee) / positionData.enter.price;
-  
+
       if (this.exit) {
         const sellFee = entranceAmount * parseFloat(this.fee);
         return ((positionData.exit.price) * (entranceAmount - sellFee)) - buyAmount;

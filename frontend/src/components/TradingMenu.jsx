@@ -7,12 +7,12 @@ class TradingMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Product: '',   
+      Product: '',
       BuyAmount: 0,
       Fee: 0,
       FromDays: 0,
       Interval: 0,
-      Mode: '',      
+      Mode: '',
       Strategy: '',
       traderRunning: false,
       traderWaiting: false
@@ -21,28 +21,36 @@ class TradingMenu extends Component {
   }
 
   componentDidMount() {
-   this.client.getDefaultTraderConfig()
-    .then(result => {      
-      const {
-        Product, 
-        BuyAmount,
-        Fee,
-        FromDays,
-        Interval,
-        Mode,        
-        Strategy
-      } = result.data;
-
+    this.client.subscribeToTraderStatusUpdates((status) => {
+      console.log(status);
       this.setState({
-        Product, 
-        BuyAmount,
-        Fee,
-        FromDays,
-        Interval,
-        Mode,        
-        Strategy
+        traderWaiting: false,
+        traderRunning: status === 'started' ? true : false
       });
     });
+
+    this.client.getDefaultTraderConfig()
+      .then(result => {
+        const {
+          Product,
+          BuyAmount,
+          Fee,
+          FromDays,
+          Interval,
+          Mode,
+          Strategy
+        } = result.data;
+
+        this.setState({
+          Product,
+          BuyAmount,
+          Fee,
+          FromDays,
+          Interval,
+          Mode,
+          Strategy
+        });
+      });
   }
 
   changeTraderState = () => {
@@ -50,48 +58,39 @@ class TradingMenu extends Component {
       traderWaiting: true
     });
 
-    let changeStatePromise;
-
-    if(this.state.traderRunning) {
-      changeStatePromise = this.client.stopTrader();
+    if (this.state.traderRunning) {
+      this.client.stopTrader();
     } else {
       const {
-        Product, 
+        Product,
         BuyAmount,
         Fee,
         FromDays,
         Interval,
-        Mode,        
+        Mode,
         Strategy
       } = this.state;
 
-      changeStatePromise = this.client.startTrader({
-        Product, 
+      this.client.startTrader({
+        Product,
         BuyAmount,
         Fee,
         FromDays,
         Interval,
-        Mode,        
+        Mode,
         Strategy
       });
     }
-
-    changeStatePromise.then(result => {
-      this.setState({
-        traderWaiting: false,
-        traderRunning: !this.state.traderRunning
-      });
-    });
   }
-  
+
   render() {
     return (
-      <div>    
-         <Header as='h4' color='teal' textAlign='center'>
+      <div>
+        <Header as='h4' color='teal' textAlign='center'>
           Trader Configuration
         </Header>
         <Form size='large'>
-          <Segment stacked>          
+          <Segment stacked>
             <Form.Input label='Product' disabled={this.state.traderRunning} fluid value={this.state.Product} />
             <Form.Input label='Strategy' disabled={this.state.traderRunning} fluid value={this.state.Strategy} />
             <Form.Input label='Mode' disabled={this.state.traderRunning} fluid value={this.state.Mode} />
@@ -99,11 +98,11 @@ class TradingMenu extends Component {
             <Form.Input label='Interval' disabled={this.state.traderRunning} fluid value={this.state.Interval} />
             <Form.Input label='Fee' disabled={this.state.traderRunning} fluid value={this.state.Fee} />
             <Form.Input label='BuyAmount' disabled={this.state.traderRunning} fluid value={this.state.BuyAmount} />
-                        
+
             <Button color='teal' onClick={this.changeTraderState} disabled={this.state.traderWaiting} fluid size='large' >
               {
                 this.state.traderRunning ?
-                'Stop' : 'Start'
+                  'Stop' : 'Start'
               }
             </Button>
           </Segment>
