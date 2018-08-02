@@ -41,11 +41,9 @@ class TestTrader extends Trader {
             })
           }));
 
-          //this.printPositions();
-          //this.printProfit();
           this.sendAllPositions();
+          this.printProfit();
           super.stop();
-
         } catch (error) {
           console.log(error);
         }
@@ -61,40 +59,10 @@ class TestTrader extends Trader {
       positions.forEach((p) => {
        let data = p.getData();
        data.profit = this.calcProfit(data);
-       this.sendPositionData(p.getData());
+       this.sendPositionData(data);
+       this.printPositionData(data);
       });
     }
-
-    calcProfit(positionData) {
-      const buyAmount = parseFloat(this.buyAmount);
-      const buyfee = buyAmount * parseFloat(this.fee);
-      const entranceAmount = (buyAmount-buyfee) / positionData.enter.price;
-
-      if (this.exit) {
-        const sellFee = entranceAmount * parseFloat(this.fee);
-        return ((positionData.exit.price) * (entranceAmount - sellFee)) - buyAmount;
-      } else {
-        return 0;
-      }
-    }
-
-    /* printPositions() {
-      const positions = this.strategy.getPositions();
-      positions.forEach((p) => {
-        p.print();
-      });
-    }
-
-    printProfit() {
-      const positions = this.strategy.getPositions();
-      const total = positions.reduce((r, p) => {
-        return r + p.profit();
-      }, 0);
-
-      const prof = `${total}`;
-      const colored = total > 0 ? colors.green(prof) : colors.red(prof)
-      console.log(`Total: ${colored}`);
-    } */
 
     async onBuySignal({ price, time }) {
       const id = randomstring.generate(20)

@@ -21,8 +21,7 @@ class TradingMenu extends Component {
   }
 
   componentDidMount() {
-    this.client.subscribeToTraderStatusUpdates((status) => {
-      console.log(status);
+    this.client.subscribeToTraderStatusUpdates((status) => {      
       this.setState({
         traderWaiting: false,
         traderRunning: status === 'started' ? true : false

@@ -1,5 +1,6 @@
 const strategyFactory = require('./strategies/strategyFactory');
 const GDAX = require('gdax');
+const colors = require('colors/safe');
 
 class Trader {
   constructor(traderConfig) {
@@ -42,8 +43,47 @@ class Trader {
 
   sendPositionData(positionData) {
     if (global.io) {
-      global.io.emit('position.update', positionData);
+      global.io.emit('trader.position.update', positionData);
     }
+  }
+
+  calcProfit(positionData) {
+    const buyAmount = parseFloat(positionData.buyAmount);
+    const buyfee = buyAmount * parseFloat(positionData.fee);
+    const entranceAmount = (buyAmount-buyfee) / positionData.enter.price;
+
+    if (positionData.exit) {
+      const sellFee = entranceAmount * parseFloat(positionData.fee);
+      return ((positionData.exit.price) * (entranceAmount - sellFee)) - buyAmount;
+    } else {
+      return 0;
+    }
+  }
+
+  printPositionData(positionData) {
+    const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time}`;
+    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit.time}` :
+      '';
+
+    var profit = '';
+    if (positionData.state === 'closed') {
+      const prof = positionData.profit.toFixed(2);
+      const colored = positionData.profit > 0 ? colors.green(prof) : colors.red(prof);
+      profit = `Profit: ${colored}`;
+    }
+
+    console.log(`${enter} - ${exit} - ${profit}`)
+  }
+
+  printProfit() {
+    const positions = this.strategy.getPositions();
+    const total = positions.reduce((r, p) => {
+      return r + this.calcProfit(p.getData());
+    }, 0);
+
+    const prof = `${total}`;
+    const colored = total > 0 ? colors.green(prof) : colors.red(prof)
+    console.log(`Total: ${colored}`);
   }
 }
 

@@ -17,7 +17,7 @@ class TradeClient {
   }
 
   subscribeToPositionUpdates(cb) {
-    this.socket.on('position.update', content => cb(content));
+    this.socket.on('trader.position.update', content => cb(content));
   }
 
   getDefaultTraderConfig() {

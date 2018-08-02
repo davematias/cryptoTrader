@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import HeaderBar from './components/Header';
 import TradingMenu from './components/TradingMenu';
+import Body from './components/Body';
 import './App.css';
-import {
-  Container,
-  Grid,
-  Header
-} from 'semantic-ui-react'
+import { Grid } from 'semantic-ui-react'
 import TraderClient from './client/TraderClient';
 
 class App extends Component {
@@ -24,14 +21,6 @@ class App extends Component {
       .then(result => {
         this.setState({ currencies: result.data});
       });
-
-      this.client.subscribeToDataUpdates((data) => {
-        console.log(data);
-      });
-
-      this.client.subscribeToPositionUpdates((data) => {
-        console.log(data);
-      });
   }
 
   render() {
@@ -42,11 +31,8 @@ class App extends Component {
                 <Grid.Column width={4}>
                   <TradingMenu />
                 </Grid.Column>
-                <Grid.Column width={8}>
-                  <Header as='h1'>Semantic UI React Fixed Template</Header>
-                  <Container text style={{ marginTop: '7em' }}>                
-                    <p>This is a basic fixed menu template using fixed size containers.</p>
-                  </Container>
+                <Grid.Column verticalAlign='top' width={12}>
+                  <Body />                  
                 </Grid.Column>
             </Grid>
       </div>
