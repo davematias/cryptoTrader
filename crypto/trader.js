@@ -6,6 +6,7 @@ class Trader {
   constructor(traderConfig) {
     this.publicClient = new GDAX.PublicClient();
     this.product = traderConfig.Product;
+    this.status = 'stopped';
 
     this.strategy = strategyFactory.create(traderConfig.Strategy, {
       onBuySignal: (x) => { this.onBuySignal(x); },
@@ -14,15 +15,23 @@ class Trader {
   }
 
   async start() {
+    this.status = 'started';
+
     if (global.io) {
       global.io.emit('trader.status', 'started');
     }
   }
 
   stop() {
+    this.status = 'stopped';
+
     if (global.io) {
       global.io.emit('trader.status', 'stopped');
     }
+  }
+
+  status() {
+    return this.status;
   }
 
   async onBuySignal({ price, time }) { }

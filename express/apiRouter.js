@@ -6,7 +6,7 @@ router.get('/', (req, res) => {
     res.send('api started');
 });
 
-router.get('/getDefaultConfig', (req, res) => {    
+router.get('/getDefaultConfig', (req, res) => {
     res.status(200).json(traderManager.getDefaultTraderConfig());
 });
 
@@ -18,6 +18,10 @@ router.post('/start', (req, res) => {
 router.post('/stop', (req, res) => {
     traderManager.stopTrader();
     res.send('trader will stop soon');
+});
+
+router.get('/status', (req, res) => {
+  res.send(traderManager.getTraderStatus());
 });
 
 /* GET available currencies */

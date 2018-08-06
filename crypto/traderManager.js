@@ -21,16 +21,24 @@ module.exports.startTrader = function(traderConfig) {
     } else {
         trader = new gdaxTrader(traderConfig);
     }
-    
-    trader.start();    
+
+    trader.start();
 }
 
 module.exports.stopTrader = function() {
     if(trader){
         trader.stop();
-    } 
-    
+    }
+
     throw new Error("Please start a trader first");
+}
+
+module.exports.getTraderStatus = function() {
+  if(trader){
+    return trader.status();
+  }
+
+  return "stoped";
 }
 
 module.exports.getDefaultTraderConfig = function() {
