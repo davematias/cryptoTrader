@@ -1,6 +1,6 @@
-const strategyFactory = require('./strategies/strategyFactory');
 const GDAX = require('gdax');
 const colors = require('colors/safe');
+const strategyFactory = require('./strategies/strategyFactory');
 
 class Trader {
   constructor(traderConfig) {
@@ -10,7 +10,7 @@ class Trader {
 
     this.strategy = strategyFactory.create(traderConfig.Strategy, {
       onBuySignal: (x) => { this.onBuySignal(x); },
-      onSellSignal: (x) => { this.onSellSignal(x); }
+      onSellSignal: (x) => { this.onSellSignal(x); },
     });
   }
 
@@ -34,9 +34,9 @@ class Trader {
     return this.status;
   }
 
-  async onBuySignal({ price, time }) { }
+  async onBuySignal() {}
 
-  async onSellSignal({ price, size, time, position }) { }
+  async onSellSignal() {}
 
   getCurrenciesPromise() {
     return this.publicClient.getCurrencies();
@@ -59,39 +59,37 @@ class Trader {
   calcProfit(positionData) {
     const buyAmount = parseFloat(positionData.buyAmount);
     const buyfee = buyAmount * parseFloat(positionData.fee);
-    const entranceAmount = (buyAmount-buyfee) / positionData.enter.price;
+    const entranceAmount = (buyAmount - buyfee) / positionData.enter.price;
 
     if (positionData.exit) {
       const sellFee = entranceAmount * parseFloat(positionData.fee);
       return ((positionData.exit.price) * (entranceAmount - sellFee)) - buyAmount;
-    } else {
-      return 0;
     }
+
+    return 0;
   }
 
   printPositionData(positionData) {
     const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time}`;
-    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit.time}` :
-      '';
+    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit.time}`
+      : '';
 
-    var profit = '';
+    let profit = '';
     if (positionData.state === 'closed') {
       const prof = positionData.profit.toFixed(2);
       const colored = positionData.profit > 0 ? colors.green(prof) : colors.red(prof);
       profit = `Profit: ${colored}`;
     }
 
-    console.log(`${enter} - ${exit} - ${profit}`)
+    console.log(`${enter} - ${exit} - ${profit}`);
   }
 
   printProfit() {
     const positions = this.strategy.getPositions();
-    const total = positions.reduce((r, p) => {
-      return r + this.calcProfit(p.getData());
-    }, 0);
+    const total = positions.reduce((r, p) => r + this.calcProfit(p.getData()), 0);
 
     const prof = `${total}`;
-    const colored = total > 0 ? colors.green(prof) : colors.red(prof)
+    const colored = total > 0 ? colors.green(prof) : colors.red(prof);
     console.log(`Total: ${colored}`);
   }
 }
