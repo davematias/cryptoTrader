@@ -19,9 +19,13 @@ class TradeClient {
   subscribeToPositionUpdates(cb) {
     this.socket.on('trader.position.update', content => cb(content));
   }
-
+  
   getDefaultTraderConfig() {
     return axios.get(`${url}/api/getDefaultConfig`);
+  }
+
+  getTraderStatus() {
+    return axios.get(`${url}/api/status`);
   }
 
   getProducts() {

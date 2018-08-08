@@ -7,13 +7,15 @@ class TradingMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Product: '',
-      BuyAmount: 0,
-      Fee: 0,
-      FromDays: 0,
-      Interval: 0,
-      Mode: '',
-      Strategy: '',
+      data: {
+        Product: '',
+        BuyAmount: 0,
+        Fee: 0,
+        FromDays: 0,
+        Interval: 0,
+        Mode: '',
+        Strategy: ''
+      },
       traderRunning: false,
       traderWaiting: false
     };
@@ -21,7 +23,15 @@ class TradingMenu extends Component {
   }
 
   componentDidMount() {
-    this.client.subscribeToTraderStatusUpdates((status) => {      
+    this.client.getTraderStatus().then(result => {
+      const traderStatus = result.data;
+      this.setState({
+        traderWaiting: false,
+        traderRunning: traderStatus.status === 'started' ? true : false
+      });
+    });
+
+    this.client.subscribeToTraderStatusUpdates((status) => {
       this.setState({
         traderWaiting: false,
         traderRunning: status === 'started' ? true : false
@@ -30,24 +40,8 @@ class TradingMenu extends Component {
 
     this.client.getDefaultTraderConfig()
       .then(result => {
-        const {
-          Product,
-          BuyAmount,
-          Fee,
-          FromDays,
-          Interval,
-          Mode,
-          Strategy
-        } = result.data;
-
         this.setState({
-          Product,
-          BuyAmount,
-          Fee,
-          FromDays,
-          Interval,
-          Mode,
-          Strategy
+          data: result.data
         });
       });
   }
@@ -59,44 +53,30 @@ class TradingMenu extends Component {
 
     if (this.state.traderRunning) {
       this.client.stopTrader();
-    } else {
-      const {
-        Product,
-        BuyAmount,
-        Fee,
-        FromDays,
-        Interval,
-        Mode,
-        Strategy
-      } = this.state;
-
-      this.client.startTrader({
-        Product,
-        BuyAmount,
-        Fee,
-        FromDays,
-        Interval,
-        Mode,
-        Strategy
-      });
+    } else {      
+      this.client.startTrader(this.state.data);
     }
   }
+
+  onChange = e => this.setState({
+    data: { ...this.state.data, [e.target.name]: e.target.value }
+  });
 
   render() {
     return (
       <div>
         <Header as='h4' color='teal' textAlign='center'>
           Trader Configuration
-        </Header>
+        </Header>        
         <Form size='large'>
-          <Segment stacked>
-            <Form.Input label='Product' disabled={this.state.traderRunning} fluid value={this.state.Product} />
-            <Form.Input label='Strategy' disabled={this.state.traderRunning} fluid value={this.state.Strategy} />
-            <Form.Input label='Mode' disabled={this.state.traderRunning} fluid value={this.state.Mode} />
-            <Form.Input label='FromDays (test mode only)' disabled={this.state.traderRunning} fluid value={this.state.FromDays} />
-            <Form.Input label='Interval' disabled={this.state.traderRunning} fluid value={this.state.Interval} />
-            <Form.Input label='Fee' disabled={this.state.traderRunning} fluid value={this.state.Fee} />
-            <Form.Input label='BuyAmount' disabled={this.state.traderRunning} fluid value={this.state.BuyAmount} />
+          <Segment stacked>            
+            <Form.Input label='Product' disabled={this.state.traderRunning} fluid name="Product" onChange={this.onChange} value={this.state.data.Product} />
+            <Form.Input label='Strategy' disabled={this.state.traderRunning} fluid name="Strategy" onChange={this.onChange} value={this.state.data.Strategy} />
+            <Form.Input label='Mode' disabled={this.state.traderRunning} fluid name="Mode" onChange={this.onChange} value={this.state.data.Mode} />
+            <Form.Input label='FromDays (test mode only)' disabled={this.state.traderRunning} fluid name="FromDays" onChange={this.onChange} value={this.state.data.FromDays} />
+            <Form.Input label='Interval' disabled={this.state.traderRunning} fluid name="Interval" onChange={this.onChange} value={this.state.data.Interval} />
+            <Form.Input label='Fee' disabled={this.state.traderRunning} fluid name="Fee" onChange={this.onChange} value={this.state.data.Fee} />
+            <Form.Input label='BuyAmount' disabled={this.state.traderRunning} fluid name="BuyAmount" onChange={this.onChange} value={this.state.data.BuyAmount} />
 
             <Button color='teal' onClick={this.changeTraderState} disabled={this.state.traderWaiting} fluid size='large' >
               {

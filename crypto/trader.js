@@ -1,11 +1,18 @@
 const GDAX = require('gdax');
 const colors = require('colors/safe');
+const PushBullet = require('pushbullet');
+
+const pusher = new PushBullet(process.env.pushbulletKey);
 const strategyFactory = require('./strategies/strategyFactory');
 
 class Trader {
   constructor(traderConfig) {
+    this.startDate = null;
     this.publicClient = new GDAX.PublicClient();
     this.product = traderConfig.Product;
+    this.interval = traderConfig.Interval;
+    this.buyAmount = traderConfig.BuyAmount;
+    this.fee = traderConfig.Fee;
     this.status = 'stopped';
 
     this.strategy = strategyFactory.create(traderConfig.Strategy, {
@@ -15,7 +22,9 @@ class Trader {
   }
 
   async start() {
+    console.log('Starting new session');
     this.status = 'started';
+    this.startDate = new Date();
 
     if (global.io) {
       global.io.emit('trader.status', 'started');
@@ -23,6 +32,7 @@ class Trader {
   }
 
   stop() {
+    console.log('Session done');
     this.status = 'stopped';
 
     if (global.io) {
@@ -30,13 +40,37 @@ class Trader {
     }
   }
 
-  status() {
-    return this.status;
+  getStatus() {
+    return {status: this.status, timeStamp: this.startDate.getTime()};
   }
 
-  async onBuySignal() {}
+  onBuySignal(price) {
+    if(process.env.pushbulletEnabled) {
+      const buyAmount = parseFloat(this.buyAmount);
+      const buyfee = buyAmount * parseFloat(this.fee);
+      const amount = (buyAmount - buyfee) / price;
+  
+      pusher.note({}, 'trader buy signal', `bougth: ${amount}`, function(error, response) {
+        if(error) {
+          console.log(error);
+        }      
+      });
+    }    
+  }
 
-  async onSellSignal() {}
+  onSellSignal(price) {
+    if(process.env.pushbulletEnabled) {
+      const buyAmount = parseFloat(this.buyAmount);
+      const buyfee = buyAmount * parseFloat(this.fee);
+      const amount = (buyAmount - buyfee) / price;
+  
+      pusher.note({}, 'trader sell signal', `sold: ${amount}`, function(error, response) {
+        if(error) {
+          console.log(error);
+        }      
+      });
+    }    
+  }
 
   getCurrenciesPromise() {
     return this.publicClient.getCurrencies();
@@ -57,12 +91,12 @@ class Trader {
   }
 
   calcProfit(positionData) {
-    const buyAmount = parseFloat(positionData.buyAmount);
-    const buyfee = buyAmount * parseFloat(positionData.fee);
+    const buyAmount = parseFloat(this.buyAmount);
+    const buyfee = buyAmount * parseFloat(this.fee);
     const entranceAmount = (buyAmount - buyfee) / positionData.enter.price;
 
     if (positionData.exit) {
-      const sellFee = entranceAmount * parseFloat(positionData.fee);
+      const sellFee = entranceAmount * parseFloat(this.fee);
       return ((positionData.exit.price) * (entranceAmount - sellFee)) - buyAmount;
     }
 

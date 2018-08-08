@@ -36,10 +36,10 @@ module.exports.stopTrader = () => {
 
 module.exports.getTraderStatus = () => {
   if (trader) {
-    return trader.status();
+    return trader.getStatus();
   }
 
-  return 'stoped';
+  return {status: 'stopped'};
 };
 
 module.exports.getDefaultTraderConfig = () => defaultConfig;

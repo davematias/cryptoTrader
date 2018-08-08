@@ -9,10 +9,7 @@ class TestTrader extends Trader {
         let date = new Date();
         date.setDate(date.getDate()-traderConfig.FromDays);
         this.startTime = date;
-        this.endTime = new Date();
-        this.interval = traderConfig.Interval;
-        this.buyAmount = traderConfig.BuyAmount;
-        this.fee = traderConfig.Fee;
+        this.endTime = new Date();       
         this.stopTask = false;
 
         this.historical = new HistoricalService({
@@ -54,6 +51,19 @@ class TestTrader extends Trader {
       super.stop();
     }
 
+    getStatus() {
+      const positions = this.strategy.getPositions().map((p) => {
+       let data = p.getData();
+       data.profit = this.calcProfit(data);       
+      });
+
+      return {
+        status: this.status, 
+        timeStamp: this.startDate.getTime(),
+        positions
+      };
+    }
+
     sendAllPositions() {
       const positions = this.strategy.getPositions();
       positions.forEach((p) => {
@@ -65,6 +75,7 @@ class TestTrader extends Trader {
     }
 
     async onBuySignal({ price, time }) {
+      super.onBuySignal(price);
       const id = randomstring.generate(20)
       this.strategy.positionOpened({
         price, time, size: process.env.BuyAmount, id
@@ -72,6 +83,7 @@ class TestTrader extends Trader {
     }
 
     async onSellSignal({ price, size, time, position }) {
+      super.onBuySignal(price);
       this.strategy.positionClosed({
         price, time, size, id: position.id
       });
