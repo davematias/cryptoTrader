@@ -2,7 +2,11 @@ const GDAX = require('gdax');
 const colors = require('colors/safe');
 const PushBullet = require('pushbullet');
 
-const pusher = new PushBullet(process.env.pushbulletKey);
+let pusher = null;
+
+if (process.env.pushbulletEnabled) {
+  pusher = new PushBullet(process.env.pushbulletKey);
+}
 const strategyFactory = require('./strategies/strategyFactory');
 
 class Trader {
@@ -41,35 +45,35 @@ class Trader {
   }
 
   getStatus() {
-    return {status: this.status, timeStamp: this.startDate.getTime()};
+    return { status: this.status, timeStamp: this.startDate.getTime() };
   }
 
   onBuySignal(price) {
-    if(process.env.pushbulletEnabled) {
+    if (process.env.pushbulletEnabled) {
       const buyAmount = parseFloat(this.buyAmount);
       const buyfee = buyAmount * parseFloat(this.fee);
       const amount = (buyAmount - buyfee) / price;
-  
-      pusher.note({}, 'trader buy signal', `bougth: ${amount}`, function(error, response) {
-        if(error) {
+
+      pusher.note({}, 'trader buy signal', `bougth: ${amount}`, (error) => {
+        if (error) {
           console.log(error);
-        }      
+        }
       });
-    }    
+    }
   }
 
   onSellSignal(price) {
-    if(process.env.pushbulletEnabled) {
+    if (process.env.pushbulletEnabled) {
       const buyAmount = parseFloat(this.buyAmount);
       const buyfee = buyAmount * parseFloat(this.fee);
       const amount = (buyAmount - buyfee) / price;
-  
-      pusher.note({}, 'trader sell signal', `sold: ${amount}`, function(error, response) {
-        if(error) {
+
+      pusher.note({}, 'trader sell signal', `sold: ${amount}`, (error) => {
+        if (error) {
           console.log(error);
-        }      
+        }
       });
-    }    
+    }
   }
 
   getCurrenciesPromise() {
