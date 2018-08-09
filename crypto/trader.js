@@ -110,8 +110,8 @@ class Trader {
   }
 
   printPositionData(positionData) {
-    const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time.toLocaleString()}`;
-    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit.timetoLocaleString()}`
+    const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time}`;
+    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit}`
       : '';
 
     let profit = '';
@@ -128,7 +128,7 @@ class Trader {
     const positions = this.strategy.getPositions();
     const total = positions.reduce((r, p) => r + this.calcProfit(p.getData()), 0);
 
-    const prof = `${total}`;
+    const prof = `${total.toFixed(2)}`;
     const colored = total > 0 ? colors.green(prof) : colors.red(prof);
     console.log(`Total: ${colored}`);
   }
