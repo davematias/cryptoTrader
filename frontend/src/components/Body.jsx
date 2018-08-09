@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Header, Card, Segment } from 'semantic-ui-react';
+import './Body.css';
 import TraderClient from '../client/TraderClient';
 
 class Body extends Component {
@@ -7,14 +8,15 @@ class Body extends Component {
         super(props);
         this.state = {
             startDate: null,
-            positions: []
+            positions: [],
+            profit: 0
         };
         this.client = new TraderClient();
     }
 
     componentDidMount() {
-        this.client.getTraderStatus().then(result => {            
-            const traderStatus = result.data;            
+        this.client.getTraderStatus().then(result => {
+            const traderStatus = result.data;
             if (traderStatus.status === 'started') {
                 this.setState({ startDate: new Date(traderStatus.timeStamp), positions: traderStatus.positions });
             } else {
@@ -33,6 +35,12 @@ class Body extends Component {
         this.client.subscribeToPositionUpdates((data) => {
             var positions = this.state.positions;
             positions.push(data);
+
+            const profit = positions.reduce((profit, currentPosition) =>
+                profit + currentPosition.profit, 0
+            );
+
+            this.setState({ profit });
         });
     }
 
@@ -46,16 +54,19 @@ class Body extends Component {
                     {
                         this.state.startDate
                             ?
-                            <p>Trader Started: {this.state.startDate.toGMTString()}</p>
+                            <p>Trader Started: {this.state.startDate.toLocaleString()}</p>
                             :
                             <p>Trader Idle</p>
+                    }
+                    {
+                        <p>Total Profit: {this.state.profit.toFixed(2)}</p>
                     }
                     <Card.Group>
                         {
                             this.state.positions.map((positionData, idx) => {
                                 const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time}`;
-                                const exit = positionData.exit 
-                                    ? `Exit: | ${positionData.exit.price} | ${positionData.exit.time}` 
+                                const exit = positionData.exit
+                                    ? `Exit: | ${positionData.exit.price} | ${positionData.exit.time}`
                                     : '';
                                 const profit = positionData.profit;
                                 const profitColor = profit > 0 ? 'green' : 'red';
@@ -67,7 +78,7 @@ class Body extends Component {
                                             <p>{enter}</p>
                                             <p>{exit}</p>
                                             <div>
-                                                <Segment color={profitColor}>Profit {profit}</Segment>
+                                                <Segment color={profitColor}>Profit {profit.toFixed(2)}</Segment>
                                             </div>
                                         </Card.Description>
                                     </Card.Content>

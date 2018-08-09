@@ -3,10 +3,12 @@ const colors = require('colors/safe');
 const PushBullet = require('pushbullet');
 
 let pusher = null;
+const pushEnabled = (process.env.pushbulletEnabled === 'true');
 
-if (process.env.pushbulletEnabled) {
+if (pushEnabled) {
   pusher = new PushBullet(process.env.pushbulletKey);
 }
+
 const strategyFactory = require('./strategies/strategyFactory');
 
 class Trader {
@@ -49,7 +51,7 @@ class Trader {
   }
 
   onBuySignal(price) {
-    if (process.env.pushbulletEnabled) {
+    if (pushEnabled) {
       const buyAmount = parseFloat(this.buyAmount);
       const buyfee = buyAmount * parseFloat(this.fee);
       const amount = (buyAmount - buyfee) / price;
@@ -63,7 +65,7 @@ class Trader {
   }
 
   onSellSignal(price) {
-    if (process.env.pushbulletEnabled) {
+    if (pushEnabled) {
       const buyAmount = parseFloat(this.buyAmount);
       const buyfee = buyAmount * parseFloat(this.fee);
       const amount = (buyAmount - buyfee) / price;
@@ -108,8 +110,8 @@ class Trader {
   }
 
   printPositionData(positionData) {
-    const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time}`;
-    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit.time}`
+    const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time.toLocaleString()}`;
+    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit.timetoLocaleString()}`
       : '';
 
     let profit = '';
