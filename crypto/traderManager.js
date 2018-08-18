@@ -1,26 +1,13 @@
-const GDAX = require('gdax');
-const GdaxTrader = require('./gdaxTrader');
-const TestTrader = require('./testTrader');
+const GdaxTestTrader = require('./gdaxTestTrader');
+const gdaxAccountService = require('./services/gdaxAccountService');
+const configProvider = require('./configuration/configurationProvider');
 
-const publicClient = new GDAX.PublicClient();
-
-const defaultConfig = {
-  Product: process.env.Product,
-  Strategy: process.env.Strategy,
-  Mode: process.env.Mode,
-  FromDays: process.env.FromDays,
-  Interval: process.env.Interval,
-  Fee: process.env.Fee,
-  BuyAmount: process.env.BuyAmount,
-};
 
 let trader;
 
 module.exports.startTrader = (traderConfig) => {
-  if (traderConfig.Mode === 'test') {
-    trader = new TestTrader(traderConfig);
-  } else {
-    trader = new GdaxTrader(traderConfig);
+  switch (traderConfig.Trader) {
+    default: trader = new GdaxTestTrader(traderConfig);
   }
 
   trader.start();
@@ -39,13 +26,19 @@ module.exports.getTraderStatus = () => {
     return trader.getStatus();
   }
 
-  return {status: 'stopped'};
+  return { status: 'stopped' };
 };
 
-module.exports.getDefaultTraderConfig = () => defaultConfig;
+module.exports.getDefaultTraderConfig = async () => configProvider.getDefaultConfiguration();
 
-module.exports.getCurrenciesPromise = () => publicClient.getCurrencies();
+module.exports.getCurrencies = async () => {
+  switch (process.env.Exchange === 'gdax') {
+    default: return gdaxAccountService.getCurrencies();
+  }
+};
 
-module.exports.getProductsPromise = () => publicClient.getProducts();
-
-// module.exports.getAccountsPromise = () => authenticatedClient.getAccounts();
+module.exports.getProducts = async () => {
+  switch (process.env.Exchange === 'gdax') {
+    default: return gdaxAccountService.getProducts();
+  }
+};

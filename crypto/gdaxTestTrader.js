@@ -1,13 +1,14 @@
 const randomstring = require('randomstring');
-const HistoricalService = require('./historicalService');
+const HistoricalService = require('./services/gdaxHistoricalService');
 const Trader = require('./trader');
 
-class TestTrader extends Trader {
+class GdaxTestTrader extends Trader {
   constructor(traderConfig) {
     super(traderConfig);
 
+    this.interval = traderConfig.TestInterval;
     const date = new Date();
-    date.setDate(date.getDate() - traderConfig.FromDays);
+    date.setDate(date.getDate() - traderConfig.TestFromDays);
     this.startTime = date;
     this.endTime = new Date();
     this.stopTask = false;
@@ -70,13 +71,12 @@ class TestTrader extends Trader {
     positions.forEach((p) => {
       const data = p.getData();
       data.profit = this.calcProfit(data);
-      this.sendPositionData(data);
-      this.printPositionData(data);
+      Trader.sendPositionData(data);
+      Trader.printPositionData(data);
     });
   }
 
   async onBuySignal({ price, time }) {
-    console.log('Buy');
     const id = randomstring.generate(20);
     this.strategy.positionOpened({
       price, time, size: process.env.BuyAmount, id,
@@ -88,7 +88,6 @@ class TestTrader extends Trader {
   async onSellSignal({
     price, size, time, position,
   }) {
-    console.log('Sell');
     this.strategy.positionClosed({
       price, time, size, id: position.id,
     });
@@ -97,4 +96,4 @@ class TestTrader extends Trader {
   }
 }
 
-module.exports = TestTrader;
+module.exports = GdaxTestTrader;

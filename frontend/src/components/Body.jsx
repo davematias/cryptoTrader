@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Header, Card, Segment } from 'semantic-ui-react';
+import { Header, Card, Segment } from 'semantic-ui-react';
 import './Body.css';
 import TraderClient from '../client/TraderClient';
 
@@ -47,10 +47,9 @@ class Body extends Component {
     render() {
         return (
             <div>
-                <Header as='h1'>
-                    Trading Log
-                </Header>
-                <Container text>
+                    <Header as='h1'>
+                        Trading Log
+                    </Header>
                     {
                         this.state.startDate
                             ?
@@ -86,7 +85,6 @@ class Body extends Component {
                             })
                         }
                     </Card.Group>
-                </Container>
             </div>
         );
     }

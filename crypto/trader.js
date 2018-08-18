@@ -3,10 +3,10 @@ const colors = require('colors/safe');
 const PushBullet = require('pushbullet');
 
 let pusher = null;
-const pushEnabled = (process.env.pushbulletEnabled === 'true');
+const pushEnabled = (process.env.PushbulletEnabled === 'true');
 
 if (pushEnabled) {
-  pusher = new PushBullet(process.env.pushbulletKey);
+  pusher = new PushBullet(process.env.PushbulletKey);
 }
 
 const strategyFactory = require('./strategies/strategyFactory');
@@ -16,7 +16,6 @@ class Trader {
     this.startDate = null;
     this.publicClient = new GDAX.PublicClient();
     this.product = traderConfig.Product;
-    this.interval = traderConfig.Interval;
     this.buyAmount = traderConfig.BuyAmount;
     this.fee = traderConfig.Fee;
     this.status = 'stopped';
@@ -90,7 +89,7 @@ class Trader {
     return this.authenticatedClient.getAccounts();
   }
 
-  sendPositionData(positionData) {
+  static sendPositionData(positionData) {
     if (global.io) {
       global.io.emit('trader.position.update', positionData);
     }
@@ -109,19 +108,18 @@ class Trader {
     return 0;
   }
 
-  printPositionData(positionData) {
-    const enter = `Enter | ${positionData.enter.price} | ${positionData.enter.time}`;
-    const exit = positionData.exit ? `Exit: | ${positionData.exit.price} | ${positionData.exit}`
-      : '';
-
+  static printPositionData(positionData) {
     let profit = '';
+
     if (positionData.state === 'closed') {
       const prof = positionData.profit.toFixed(2);
       const colored = positionData.profit > 0 ? colors.green(prof) : colors.red(prof);
       profit = `Profit: ${colored}`;
     }
 
-    console.log(`${enter} - ${exit} - ${profit}`);
+    if (positionData.exit) {
+      console.log(`${positionData.exit.time} : ${profit}`);
+    }
   }
 
   printProfit() {

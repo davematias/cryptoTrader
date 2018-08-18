@@ -10,7 +10,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currencies: []      
+      currencies: []
     };
 
     this.client = new TraderClient()
@@ -28,11 +28,11 @@ class App extends Component {
       <div className="App">
         <HeaderBar currencies={this.state.currencies} />
             <Grid container divided stackable style={{ marginTop: '2em' }}>
-                <Grid.Column width={4}>
+                <Grid.Column width={5}>
                   <TradingMenu />
                 </Grid.Column>
-                <Grid.Column verticalAlign='top' width={12}>
-                  <Body />                  
+                <Grid.Column verticalAlign='top' width={11}>
+                  <Body />
                 </Grid.Column>
             </Grid>
       </div>
